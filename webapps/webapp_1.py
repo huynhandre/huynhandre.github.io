@@ -52,7 +52,7 @@ def main():
     cylinder_color = THREE.Color.new(255,255,255)
     material = THREE.MeshBasicMaterial.new()
     material.transparent = True
-    material.opacity = 0.5
+    material.opacity = 0.75
     material.color = cylinder_color
 
     global line_material
