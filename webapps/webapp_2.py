@@ -43,7 +43,7 @@ def main():
     material = THREE.MeshBasicMaterial.new()
     material.color = THREE.Color.new(255,255,255)
     material.transparent = True
-    material.opacity = 0.75
+    material.opacity = 0.6
 
     line_material = THREE.LineBasicMaterial.new()
     line_material.color = THREE.Color.new(100,100,100)
