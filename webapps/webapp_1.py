@@ -44,7 +44,7 @@ def main():
     cylinder_edges = []
     cylinders_spread = []
     cylinder_edges_spread = []
-    geom1_params = {"steps":25, "riser_height":1.5, "tread_width":15, "tread_depth":20, "spread":0}
+    geom1_params = {"steps":20, "riser_height":1.2, "tread_width":15, "tread_depth":20, "spread":0}
     geom1_params = Object.fromEntries(to_js(geom1_params))
    
     #Materials
