@@ -21,7 +21,7 @@ def main():
 
     # Set up the scene
     scene = THREE.Scene.new()
-    back_color = THREE.Color.new(0.1,0.1,0.1)
+    back_color = THREE.Color.new(255,255,255)
     scene.background = back_color
     camera = THREE.PerspectiveCamera.new(75, window.innerWidth/window.innerHeight, 0.1, 1000)
     camera.position.z = 50
@@ -49,14 +49,14 @@ def main():
    
     #Materials
     global material
-    cylinder_color = THREE.Color.new(255,255,255)
+    cylinder_color = THREE.Color.new(255,0,0)
     material = THREE.MeshBasicMaterial.new()
     material.transparent = True
     material.opacity = 0.6
     material.color = cylinder_color
 
     global line_material
-    edge_color = THREE.Color.new(100, 100, 100)
+    edge_color = THREE.Color.new(255, 0, 0)
     line_material = THREE.LineBasicMaterial.new()
     line_material.color = edge_color
 

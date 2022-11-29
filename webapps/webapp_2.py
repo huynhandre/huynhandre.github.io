@@ -21,7 +21,7 @@ def main():
 
     # Set up the scene
     scene = THREE.Scene.new()
-    back_color = THREE.Color.new(0.1,0.1,0.1)
+    back_color = THREE.Color.new(255,255,255)
     scene.background = back_color
     camera = THREE.PerspectiveCamera.new(75, window.innerWidth/window.innerHeight, 0.1, 1000)
     camera.position.z = 50
@@ -41,12 +41,12 @@ def main():
     global material, line_material
 
     material = THREE.MeshBasicMaterial.new()
-    material.color = THREE.Color.new(255,255,255)
+    material.color = THREE.Color.new(255,0,0)
     material.transparent = True
     material.opacity = 0.6
 
     line_material = THREE.LineBasicMaterial.new()
-    line_material.color = THREE.Color.new(100,100,100)
+    line_material.color = THREE.Color.new(255,0,0)
 
     # All Objects
     global all_Dodecahedrons, all_Dodecahedron_edges
