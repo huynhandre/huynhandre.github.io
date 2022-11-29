@@ -55,7 +55,7 @@ def main():
 
     # Control Parameters
     global geom1_params
-    geom1_params = {"distance": 45, "iterations":2, "radius":10}
+    geom1_params = {"distance": 45, "iterations":1, "radius":10}
     geom1_params = Object.fromEntries(to_js(geom1_params))
 
 
@@ -70,7 +70,7 @@ def main():
     
     geometries.append(geometry)
 
-    move_geometry(0, geom1_params.iterations, geometries)
+    move_geometry(0, geom1_params.iterations + 1, geometries)
 
     #-----------------------------------------------------------------------
     # USER INTERFACE
@@ -82,7 +82,7 @@ def main():
     param_folder = gui.addFolder('Parameters')
     param_folder.add(geom1_params, 'radius', 1,20,1)
     param_folder.add(geom1_params, 'distance', 25,100)
-    param_folder.add(geom1_params, 'iterations', 1,4,1)
+    param_folder.add(geom1_params, 'iterations', 0,3,1)
     param_folder.open()
     
     #-----------------------------------------------------------------------
@@ -94,7 +94,7 @@ def main():
 # Update Secne
 def update():
     global all_Dodecahedrons, all_Dodecahedron_edges, t, iteration, radius
-    if geom1_params.distance != t or geom1_params.iterations != iteration or radius != geom1_params.radius:
+    if geom1_params.distance != t or geom1_params.iterations + 1 != iteration or radius != geom1_params.radius:
         for Dodecahedron in all_Dodecahedrons:  
             scene.remove(Dodecahedron)
         for Dodecahedron_edges in all_Dodecahedron_edges:
@@ -109,7 +109,7 @@ def update():
     
         geometries.append(geometry)
 
-        move_geometry(0, geom1_params.iterations, geometries)
+        move_geometry(0, geom1_params.iterations + 1, geometries)
     else:
         pass
 
@@ -173,7 +173,7 @@ def move_geometry(current_iteration, max_iterations, geometries):
         new_geometries = []
 
         global iteration
-        iteration = geom1_params.iterations
+        iteration = geom1_params.iterations + 1
 
         pass
         
