@@ -55,14 +55,17 @@ def main():
 
     # Control Parameters
     global geom1_params
-    geom1_params = {"distance": 45, "iterations":2}
+    geom1_params = {"distance": 45, "iterations":2, "radius":10}
     geom1_params = Object.fromEntries(to_js(geom1_params))
 
 
     # First Dodecahedron 
     global geometries
     geometries = []
-    geometry = THREE.DodecahedronGeometry.new(10)
+    global radius
+    radius = geom1_params.radius
+    
+    geometry = THREE.DodecahedronGeometry.new(geom1_params.radius)
     geometry.rotateX(math.radians(31.717))
     
     geometries.append(geometry)
@@ -77,6 +80,7 @@ def main():
     # Set up GUI
     gui = window.dat.GUI.new()
     param_folder = gui.addFolder('Parameters')
+    param_folder.add(geom1_params, 'radius', 1,20,1)
     param_folder.add(geom1_params, 'distance', 25,100)
     param_folder.add(geom1_params, 'iterations', 1,4,1)
     param_folder.open()
@@ -89,14 +93,22 @@ def main():
 # HELPER FUNCTIONS
 # Update Secne
 def update():
-    global all_Dodecahedrons, all_Dodecahedron_edges, t, iteration
-    if geom1_params.distance != t or geom1_params.iterations != iteration:
+    global all_Dodecahedrons, all_Dodecahedron_edges, t, iteration, radius
+    if geom1_params.distance != t or geom1_params.iterations != iteration or radius != geom1_params.radius:
         for Dodecahedron in all_Dodecahedrons:  
             scene.remove(Dodecahedron)
         for Dodecahedron_edges in all_Dodecahedron_edges:
             scene.remove(Dodecahedron_edges)
         all_Dodecahedrons = []
         all_Dodecahedron_edges = []
+        geometries = []
+
+        radius = geom1_params.radius
+        geometry = THREE.DodecahedronGeometry.new(geom1_params.radius)
+        geometry.rotateX(math.radians(31.717))
+    
+        geometries.append(geometry)
+
         move_geometry(0, geom1_params.iterations, geometries)
     else:
         pass
