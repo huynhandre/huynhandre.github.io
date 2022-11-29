@@ -55,7 +55,7 @@ def main():
 
     # Control Parameters
     global geom1_params
-    geom1_params = {"distance": 50, "iterations":2}
+    geom1_params = {"distance": 45, "iterations":2}
     geom1_params = Object.fromEntries(to_js(geom1_params))
 
 
