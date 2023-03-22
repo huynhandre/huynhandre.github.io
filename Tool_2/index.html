@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <link rel="stylesheet" href="../style.css">
+    <title>AAD WS 2022/2023</title>
+</head>
+<body>
+    <div class="main-body">
+		<nav id="navbar">
+			<header id="nav-header">André Huynh</header>
+            <a href="/" class="nav-link">
+				HOME</a>
+			<a href="../homework_I" class="nav-link">
+				ABSTRACT SPIRAL STAIRS</a>
+			<a href="./" class="nav-link">
+				DODECAHEDRON PATTERNS</a>
+		</nav>
+
+        <main id="main-doc">
+            <h1>
+                Dodecahedron Patterns
+            </h1>
+            <section class="main-section" id="description">
+                <header>
+                    Project Description
+                </header>
+                <p>
+                    The pattern subsists of identical dodecahedrons with a certain radius. Starting from a single dodecahedron in the center, every iteration step goes as follows: First, the previously constructed dodecahedrons from the last iteration are duplicated. Then, they are moved away from their current position in orthogonal direction to the twelve faces of the original dodecahedron. The total number of dodecahedrons x for n iterations is: <br> 
+                    x<sub>n</sub>  = x<sub>n-1</sub> + 12<sup>n</sup>. The moving distance determines the space between the dodecahedrons in the pattern.
+                <img src="../images/design_iterations2.jpg" alt="Design Iterations">
+            </section>
+
+            <section class="main-section" id="algorithm">
+                <header>
+                    Algorithm
+                </header>
+                <p>
+                    In a for-loop, the input-dodecahedrons are copied and moved in twelve directions. Next, they are saved in a new list in order to serve as the input in the next iteration, until the maximum iteration is reached. 
+                <br>
+                </p>
+                <img src="../images/flowchart2.jpg" alt="Algorithm FlowChart">
+            </section>
+
+            <section class="main-section" id="web-app">
+                <header>
+                    Web App
+                </header>
+                <body>
+                    <p>
+                    Use the "distance"-sylider to change the distance between dodecahedrons. With the "iterations"-slider you can choose the desired number of iterations.
+                    </p>
+                    <iframe class="responsive-iframe" src="../webapps/webapp_2.html"></iframe>
+                </body>
+                <p>
+                    <br>
+                </p>
+            </section>
+            
+        </main>
+    </div>
+</body>
+</html>
