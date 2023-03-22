@@ -37,40 +37,74 @@ def main():
     #-----------------------------------------------------------------------
     # YOUR DESIGN / GEOMETRY GENERATION
     # Geometry Creation
-    # Material
-    global material, line_material
 
+    # Parameters
+    global geom1_params, cylinders, cylinder_edges, cylinders_spread, cylinder_edges_spread
+    cylinders = []
+    cylinder_edges = []
+    cylinders_spread = []
+    cylinder_edges_spread = []
+    geom1_params = {"steps":20, "riser_height":1.2, "tread_width":15, "tread_depth":20, "spread":0}
+    geom1_params = Object.fromEntries(to_js(geom1_params))
+   
+    #Materials
+    global material
+    cylinder_color = THREE.Color.new(255,0,0)
     material = THREE.MeshBasicMaterial.new()
-    material.color = THREE.Color.new(255,0,0)
     material.transparent = True
     material.opacity = 0.6
+    material.color = cylinder_color
 
+    global line_material
+    edge_color = THREE.Color.new(255, 0, 0)
     line_material = THREE.LineBasicMaterial.new()
-    line_material.color = THREE.Color.new(255,0,0)
+    line_material.color = edge_color
 
-    # All Objects
-    global all_Dodecahedrons, all_Dodecahedron_edges
-    all_Dodecahedrons = []
-    all_Dodecahedron_edges = []
+    #Store GUI Parameters once
+    global riser_heights, tread_widths, tread_depths, spread
+    riser_heights = geom1_params.riser_height
+    tread_widths = geom1_params.tread_width 
+    tread_depths = geom1_params.tread_depth 
+    spread = geom1_params.spread
 
-    # Control Parameters
-    global geom1_params
-    geom1_params = {"distance": 45, "iterations":1, "radius":10}
-    geom1_params = Object.fromEntries(to_js(geom1_params))
+    #Cylinder Creation
+    for i in range(geom1_params.steps):
+        geometry = THREE.CylinderGeometry.new(geom1_params.tread_width, geom1_params.tread_width, geom1_params.riser_height, 64, 1, False, 0, math.radians(geom1_params.tread_depth))
+        geometry.rotateY(math.radians(geom1_params.tread_depth)*i)
+        geometry.translate(0, geom1_params.riser_height*i, 0)
 
-
-    # First Dodecahedron 
-    global geometries
-    geometries = []
-    global radius
-    radius = geom1_params.radius
+        cylinder = THREE.Mesh.new(geometry, material)
+        scene.add(cylinder)
+        cylinders.append(cylinder)
     
-    geometry = THREE.DodecahedronGeometry.new(geom1_params.radius)
-    geometry.rotateX(math.radians(31.717))
-    
-    geometries.append(geometry)
+        geometry_edge = THREE.EdgesGeometry.new(cylinder.geometry)
 
-    move_geometry(0, geom1_params.iterations + 1, geometries)
+        cylinder_edge = THREE.LineSegments.new(geometry_edge, line_material)
+        scene.add(cylinder_edge)
+        cylinder_edges.append(cylinder_edge)
+
+        # Get direction in which step points
+        direction = THREE.Vector3.new( 0, 0, geom1_params.tread_width)
+        direction.applyAxisAngle(THREE.Vector3.new(0, 1, 0), math.radians(geom1_params.tread_depth)*i + math.radians(geom1_params.tread_depth)/2)
+
+        for t in range(geom1_params.spread):
+            geometry_spread = THREE.CylinderGeometry.new(geom1_params.tread_width, geom1_params.tread_width, geom1_params.riser_height, 64, 1, False, 0, math.radians(geom1_params.tread_depth))
+            geometry_spread.rotateY(math.radians(geom1_params.tread_depth)*i)
+            # neighbouring Stairways twist in opposite directions
+            geometry_spread.translate(0, geom1_params.riser_height*i*-(-1)**t, 0)
+            # Stairways are moved to the same level
+            geometry_spread.translate (0, geom1_params.steps * geom1_params.riser_height * (((-1)**t + 1)/2), 0)
+            geometry_spread.translate (direction.x*t + direction.x, direction.y*t + direction.y , direction.z*t + direction.z)
+
+            cylinder_spread = THREE.Mesh.new(geometry_spread, material)
+            scene.add(cylinder_spread)
+            cylinders_spread.append(cylinder_spread)
+    
+            geometry_edge_spread = THREE.EdgesGeometry.new(cylinder_spread.geometry)
+
+            cylinder_edge_spread = THREE.LineSegments.new(geometry_edge_spread, line_material)
+            scene.add(cylinder_edge_spread)
+            cylinder_edges_spread.append(cylinder_edge_spread)
 
     #-----------------------------------------------------------------------
     # USER INTERFACE
@@ -80,149 +114,129 @@ def main():
     # Set up GUI
     gui = window.dat.GUI.new()
     param_folder = gui.addFolder('Parameters')
-    param_folder.add(geom1_params, 'radius', 1,20,1)
-    param_folder.add(geom1_params, 'distance', 25,100)
-    param_folder.add(geom1_params, 'iterations', 0,3,1)
+    param_folder.add(geom1_params, 'steps', 1,100,1)
+    param_folder.add(geom1_params, 'tread_depth', 5,45)
+    param_folder.add(geom1_params, 'tread_width', 10,40,1)
+    param_folder.add(geom1_params, 'riser_height', 1, 5, 0.1)
+    param_folder.add(geom1_params, 'spread', 0, 10, 1)
     param_folder.open()
     
     #-----------------------------------------------------------------------
     # RENDER + UPDATE THE SCENE AND GEOMETRIES
     render()
-
+    
 #-----------------------------------------------------------------------
 # HELPER FUNCTIONS
-# Update Secne
-def update():
-    global all_Dodecahedrons, all_Dodecahedron_edges, t, iteration, radius
-    if geom1_params.distance != t or geom1_params.iterations + 1 != iteration or radius != geom1_params.radius:
-        for Dodecahedron in all_Dodecahedrons:  
-            scene.remove(Dodecahedron)
-        for Dodecahedron_edges in all_Dodecahedron_edges:
-            scene.remove(Dodecahedron_edges)
-        all_Dodecahedrons = []
-        all_Dodecahedron_edges = []
-        geometries = []
+# Update Stairway
+def update_cylinders():
+    global material, line_material, cylinders, cylinder_edges, cylinders_spread, cylinder_edges_spread
+    global riser_heights, tread_widths, tread_depths, spread
+    # If number of steps is changed, all Stairways must be rebuild
+    if len(cylinders) != 0:
+        if len(cylinders) != geom1_params.steps:
 
-        radius = geom1_params.radius
-        geometry = THREE.DodecahedronGeometry.new(geom1_params.radius)
-        geometry.rotateX(math.radians(31.717))
+            for cylinder in cylinders:
+                scene.remove(cylinder)
+            for cylinder_edge in cylinder_edges:
+                scene.remove(cylinder_edge)
+            for cylinder_spread in cylinders_spread:
+                scene.remove(cylinder_spread)
+            for cylinder_edge_spread in cylinder_edges_spread:
+                scene.remove(cylinder_edge_spread)
+
+            cylinders_spread = []
+            cylinder_edges_spread = []
+            cylinders = []
+            cylinder_edges = []
+
+            for i in range(geom1_params.steps):
+                geometry = THREE.CylinderGeometry.new(geom1_params.tread_width, geom1_params.tread_width, geom1_params.riser_height, 64, 1, False, 0, math.radians(geom1_params.tread_depth))
+                geometry.rotateY(math.radians(geom1_params.tread_depth)*i)
+                geometry.translate(0, geom1_params.riser_height*i, 0)
+
+                cylinder = THREE.Mesh.new(geometry, material)
+                scene.add(cylinder)
+                cylinders.append(cylinder)
     
-        geometries.append(geometry)
+                geometry_edge = THREE.EdgesGeometry.new(cylinder.geometry)
 
-        move_geometry(0, geom1_params.iterations + 1, geometries)
-    else:
-        pass
+                cylinder_edge = THREE.LineSegments.new(geometry_edge,line_material)
+                scene.add(cylinder_edge)
+                cylinder_edges.append(cylinder_edge)    
+                
+                position = THREE.Vector3.new( 0, 0, geom1_params.tread_width)
+                position.applyAxisAngle(THREE.Vector3.new(0, 1, 0), math.radians(geom1_params.tread_depth)*i + math.radians(geom1_params.tread_depth)/2)
 
-# Move Dodecahedrons
-def move_geometry(current_iteration, max_iterations, geometries):
-    current_iteration += 1
-    mesh_geometry(geometries)
-    new_geometries = []
-    for geometry in geometries:
-        get_vectors(geometry)
-        
-        new_geometry1 = geometry.clone()
-        new_geometry1.translate(vector1.x, vector1.y, vector1.z)
-        new_geometries.append(new_geometry1)
+                for t in range(geom1_params.spread): 
+                    geometry_spread = THREE.CylinderGeometry.new(geom1_params.tread_width, geom1_params.tread_width, geom1_params.riser_height, 64, 1, False, 0, math.radians(geom1_params.tread_depth))
+                    geometry_spread.rotateY(math.radians(geom1_params.tread_depth)*i)
+                    geometry_spread.translate(0, geom1_params.riser_height*i*-(-1)**t, 0)
+                    geometry_spread.translate (0, geom1_params.steps * geom1_params.riser_height * (((-1)**t + 1)/2), 0)
+                    geometry_spread.translate (position.x*t + position.x, position.y*t + position.y , position.z*t + position.z)
 
-        new_geometry2 = geometry.clone()
-        new_geometry2.translate(vector2.x, vector2.y, vector2.z)
-        new_geometries.append(new_geometry2)
-
-        new_geometry3 = geometry.clone()
-        new_geometry3.translate(vector3.x, vector3.y, vector3.z)
-        new_geometries.append(new_geometry3)
+                    cylinder_spread = THREE.Mesh.new(geometry_spread, material)
+                    scene.add(cylinder_spread)
+                    cylinders_spread.append(cylinder_spread)
     
-        new_geometry4 = geometry.clone()
-        new_geometry4.translate(vector4.x, vector4.y, vector4.z)
-        new_geometries.append(new_geometry4)    
+                    geometry_edge_spread = THREE.EdgesGeometry.new(cylinder_spread.geometry)
 
-        new_geometry5 = geometry.clone()
-        new_geometry5.translate(vector5.x, vector5.y, vector5.z)
-        new_geometries.append(new_geometry5)
+                    cylinder_edge_spread = THREE.LineSegments.new(geometry_edge_spread, line_material)
+                    scene.add(cylinder_edge_spread)
+                    cylinder_edges_spread.append(cylinder_edge_spread)
+
+        #If Paramters are changed
+        if riser_heights != geom1_params.riser_height or tread_widths != geom1_params.tread_width or tread_depths != geom1_params.tread_depth or spread != geom1_params.spread:
+            #Store new GUI Parameters
+            riser_heights = geom1_params.riser_height
+            tread_widths = geom1_params.tread_width 
+            tread_depths = geom1_params.tread_depth 
+            spread = geom1_params.spread
+
+            for cylinder_spread in cylinders_spread:
+                scene.remove(cylinder_spread)
+            for cylinder_edge_spread in cylinder_edges_spread:
+                scene.remove(cylinder_edge_spread)
+            cylinders_spread = []
+            cylinder_edges_spread = []
+
+            for i in range(len(cylinders)):
+                cylinder = cylinders[i]
+                cylinder_edge = cylinder_edges[i]
+
+                geometry = THREE.CylinderGeometry.new(geom1_params.tread_width, geom1_params.tread_width, geom1_params.riser_height, 64, 1, False, 0, math.radians(geom1_params.tread_depth))
+                geometry.rotateY(math.radians(geom1_params.tread_depth)*i)
+                geometry.translate(0, geom1_params.riser_height*i, 0)
+                cylinder.geometry = geometry
     
-        new_geometry6 = geometry.clone()
-        new_geometry6.translate(vector6.x, vector6.y, vector6.z)
-        new_geometries.append(new_geometry6)
+                geometry_edge = THREE.EdgesGeometry.new(cylinder.geometry)
+                cylinder_edge.geometry = geometry_edge
+
+                position = THREE.Vector3.new( 0, 0, geom1_params.tread_width)
+                position.applyAxisAngle(THREE.Vector3.new(0, 1, 0), math.radians(geom1_params.tread_depth)*i + math.radians(geom1_params.tread_depth)/2)
+
+                for t in range(geom1_params.spread): 
+                    geometry_spread = THREE.CylinderGeometry.new(geom1_params.tread_width, geom1_params.tread_width, geom1_params.riser_height, 64, 1, False, 0, math.radians(geom1_params.tread_depth))
+                    geometry_spread.rotateY(math.radians(geom1_params.tread_depth)*i)
+                    geometry_spread.translate(0, geom1_params.riser_height*i*-(-1)**t, 0)
+                    geometry_spread.translate (0, geom1_params.steps * geom1_params.riser_height * (((-1)**t + 1)/2), 0)
+                    geometry_spread.translate (position.x*t + position.x, position.y*t + position.y , position.z*t + position.z)
+
+                    cylinder_spread = THREE.Mesh.new(geometry_spread, material)
+                    scene.add(cylinder_spread)
+                    cylinders_spread.append(cylinder_spread)
     
-        new_geometry7 = geometry.clone()
-        new_geometry7.translate(vector7.x, vector7.y, vector7.z)
-        new_geometries.append(new_geometry7)
+                    geometry_edge_spread = THREE.EdgesGeometry.new(cylinder_spread.geometry)
 
-        new_geometry8 = geometry.clone()
-        new_geometry8.translate(vector8.x, vector8.y, vector8.z)
-        new_geometries.append(new_geometry8)
-
-        new_geometry9 = geometry.clone()
-        new_geometry9.translate(vector9.x, vector9.y, vector9.z)
-        new_geometries.append(new_geometry9)    
-
-        new_geometry10 = geometry.clone()
-        new_geometry10.translate(vector10.x, vector10.y, vector10.z)
-        new_geometries.append(new_geometry10)
-
-        new_geometry11 = geometry.clone()
-        new_geometry11.translate(vector11.x, vector11.y, vector11.z)
-        new_geometries.append(new_geometry11)        
-
-        new_geometry12 = geometry.clone()
-        new_geometry12.translate(vector12.x, vector12.y, vector12.z)
-        new_geometries.append(new_geometry12)
-
-    if current_iteration >= max_iterations:
-        new_geometries = []
-
-        global iteration
-        iteration = geom1_params.iterations + 1
-
-        pass
-        
-    else:
-        return move_geometry(current_iteration, max_iterations, new_geometries) 
-
-# Get Vectors
-def get_vectors(geometry):
-    # Get Geometry Center:
-    geometry.computeBoundingBox()
-    center = THREE.Vector3.new()
-    geometry.boundingBox.getCenter(center)
-
-    global t
-    t = geom1_params.distance
-
-    global vector1, vector2, vector3, vector4, vector5, vector6, vector7, vector8, vector9, vector10, vector11, vector12
-
-    vector1 = THREE.Vector3.new((0*t) + center.x, (1*t) + center.y, (0*t) + center.z)
-    vector2 = THREE.Vector3.new((0*t) + center.x, (-1*t) + center.y, (0*t) + center.z)
-    vector3 = THREE.Vector3.new((-0.723604*t) + center.x, (-0.447221*t) + center.y, (0.525728*t) + center.z)
-    vector4 = THREE.Vector3.new((0.723604*t) + center.x, +(0.447221*t) + center.y, (-0.525728*t) + center.z)
-    vector5 = THREE.Vector3.new((0.276394*t) + center.x, (-0.447221*t) + center.y, (0.850647*t) + center.z)
-    vector6 = THREE.Vector3.new((-0.276394*t) + center.x, (0.447221*t) + center.y, (-0.850647*t) + center.z)
-    vector7 = THREE.Vector3.new((0.894423*t) + center.x, (-0.447221*t) + center.y, (9.7106*(10**(-6))*t) + center.z) 
-    vector8 = THREE.Vector3.new((-0.894423*t) + center.x, (0.447221*t)  + center.y, (-9.7106*(10**(-6))*t) + center.z)
-    vector9 = THREE.Vector3.new((0.276412*t) + center.x, (-0.447221*t) + center.y, (-0.850641*t) + center.z)
-    vector10 = THREE.Vector3.new((-0.276412*t) + center.x, (0.447221*t) + center.y, (0.850641*t) + center.z)
-    vector11 = THREE.Vector3.new((-0.723594*t) + center.x, (-0.447221*t) + center.y, (-0.525742*t) + center.z)
-    vector12 = THREE.Vector3.new((0.723594*t) + center.x, (0.447221*t) + center.y, (0.525742*t) + center.z)
-
-# Mesh the Geometries
-def mesh_geometry(geometries):
-    for geometry in geometries:
-        Dodecahedron = THREE.Mesh.new(geometry, material)
-
-        geometry_edges = THREE.EdgesGeometry.new(Dodecahedron.geometry)
-        Dodecahedron_edges = THREE.LineSegments.new(geometry_edges, line_material)
-
-        scene.add(Dodecahedron)
-        scene.add(Dodecahedron_edges)
-
-        all_Dodecahedrons.append(Dodecahedron)
-        all_Dodecahedron_edges.append(Dodecahedron_edges)
-
+                    cylinder_edge_spread = THREE.LineSegments.new(geometry_edge_spread, line_material)
+                    scene.add(cylinder_edge_spread)
+                    cylinder_edges_spread.append(cylinder_edge_spread)    
+        #If there are no changes at all            
+        else: 
+            pass
 # Simple render and animate
 def render(*args):
     window.requestAnimationFrame(create_proxy(render))
-    update()
+    update_cylinders()
     controls.update()
     composer.render()
 
@@ -258,6 +272,7 @@ def on_window_resize(event):
 
     #post processing after resize
     post_process()
+
 #-----------------------------------------------------------------------
 #RUN THE MAIN PROGRAM
 if __name__=='__main__':

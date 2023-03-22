@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
     <link rel="stylesheet" href="../style.css">
-    <title>AAD WS 2022/2023</title>
+    <title>AAD WS 2022/2023</title> 
 </head>
 <body>
     <div class="main-body">
@@ -13,24 +13,26 @@
 			<header id="nav-header">André Huynh</header>
             <a href="/" class="nav-link">
 				HOME</a>
-			<a href="../homework_I" class="nav-link">
+			<a href="./Tool_1/" class="nav-link">
+				STAIR TOOL</a>
+			<a href="./Tool_2/" class="nav-link">
 				ABSTRACT SPIRAL STAIRS</a>
-			<a href="./" class="nav-link">
+			<a href="./Tool_3/" class="nav-link">
 				DODECAHEDRON PATTERNS</a>
 		</nav>
 
         <main id="main-doc">
             <h1>
-                Dodecahedron Patterns
+            Abstract Spiral Stairs    
             </h1>
             <section class="main-section" id="description">
                 <header>
                     Project Description
                 </header>
                 <p>
-                    The pattern subsists of identical dodecahedrons with a certain radius. Starting from a single dodecahedron in the center, every iteration step goes as follows: First, the previously constructed dodecahedrons from the last iteration are duplicated. Then, they are moved away from their current position in orthogonal direction to the twelve faces of the original dodecahedron. The total number of dodecahedrons x for n iterations is: <br> 
-                    x<sub>n</sub>  = x<sub>n-1</sub> + 12<sup>n</sup>. The moving distance determines the space between the dodecahedrons in the pattern.
-                <img src="../images/design_iterations2.jpg" alt="Design Iterations">
+                    The geometry consists of multiple cylinder segments, which together form a spiral stairway with a given number of steps. All of these basic elements have the same hight, radius and segment angle. By adjusting the three parameters, the overal shape of the stairway can be defined. Every segment is rotated around the y-axis by the segment angle and moved up in y-direction by the cylinder heigh. In order to generate a more abstract geometry, the steps can also be moved radial from the center by the radius of the cylinder segments. In this way new staircases are created around the original one. In addition every neighbouring spiral stairs twist in different directions to produce an interesting result.
+                </p>
+                <img src="../images/design_iterations.jpg" alt="Design Iterations">
             </section>
 
             <section class="main-section" id="algorithm">
@@ -38,10 +40,10 @@
                     Algorithm
                 </header>
                 <p>
-                    In a for-loop, the input-dodecahedrons are copied and moved in twelve directions. Next, they are saved in a new list in order to serve as the input in the next iteration, until the maximum iteration is reached. 
-                <br>
+                    The first for-loop creates the main spiral stair. The second for-loop builds the staircases around the first one.
                 </p>
-                <img src="../images/flowchart2.jpg" alt="Algorithm FlowChart">
+                <img src="../images/flowchart1.jpg" alt="Algorithm FlowChart">
+
             </section>
 
             <section class="main-section" id="web-app">
@@ -50,15 +52,15 @@
                 </header>
                 <body>
                     <p>
-                    Use the "distance"-sylider to change the distance between dodecahedrons. With the "iterations"-slider you can choose the desired number of iterations.
+                    With the "steps"-slider you can control the number of steps of the staircase."tread_depth", "tread_width" and "riser_height" are used to define the dimensions of every single step. <br> 
+                    The "spread"-slider is utilized to create new staircases around the original staircase.
                     </p>
-                    <iframe class="responsive-iframe" src="../webapps/webapp_2.html"></iframe>
+                    <iframe class="responsive-iframe" src="../webapps/webapp_1.html"></iframe>
+                    <p>
+                        <br>
+                    </p>
                 </body>
-                <p>
-                    <br>
-                </p>
             </section>
-            
         </main>
     </div>
 </body>
