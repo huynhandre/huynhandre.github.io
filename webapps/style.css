@@ -1,0 +1,85 @@
+:root {
+    --border-radius: 14px;
+    --inner-border-radius: calc(var(--border-radius) / 2);
+    --primary-color: rgb(238, 238, 238);
+    --secondary-color: rgb(255, 255, 255);
+    --prime-hover: rgb(214, 214, 214);
+    --prime-hover2:rgb(180, 180, 180);
+    --contrasting-color: rgb(49, 49, 49);
+    --box-shadow: rgb(139, 139, 139, 0.12);
+}   
+body {
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+.py-terminal-hidden {
+    display: none;
+}
+/*---change dat.GUI --------------------------------------------------------------------------- */
+.dg {
+    color: var(--contrasting-color) !important;
+    text-shadow: none !important;
+}
+.dg.main {
+    position: fixed;
+    right: 15px;
+    top: 30px;
+}
+.dg .main .close-button {
+    position: relative;
+    z-index: -1;
+    border-radius: 0 0 var(--border-radius) var(--border-radius) !important;
+    height: 27px !important;
+    display: grid;
+    align-items: center;
+    background-color: var(--primary-color) !important;
+    box-shadow:
+     -2px 5px 13px 1px var(--box-shadow);
+    left:0px;
+}
+.dg li.title {
+    border-radius: 0 0 0 0;
+    background: var(--secondary-color)
+     url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat !important;
+    border-bottom: 1px solid var(--box-shadow) !important;
+}   
+.dg li:nth-of-type(1) .title {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border-bottom: 1px solid var(--box-shadow);
+}
+.dg li.cr {
+    background-color: var(--secondary-color) !important;
+    border-right: 1px solid var(--primary-color) !important;
+    border-bottom: 1px solid var(--primary-color) !important; 
+}
+.dg .closed li:not(.title) {
+    border: none !important;
+}
+.dg .slider-fg {
+    border-radius: var(--inner-border-radius);
+}
+.dg .slider {
+    border-radius: var(--inner-border-radius);
+}
+.dg .c input {
+    border-radius: var(--inner-border-radius);
+    background: var(--secondary-color)
+}
+.dg .c .slider {
+    background-color: var(--primary-color) !important;
+}
+.dg .a {
+    border-radius: var(--border-radius)  var(--border-radius) 0 0 ;
+    box-shadow: -2px 5px 13px 1px var(--box-shadow);
+}
+div.close-button .close-bottom {
+    width: 22px !important;
+}
+.dg .cr.number input {
+    background-color: var(--primary-color) !important;
+}
+.dg .c select {
+    border-radius: var(--inner-border-radius);
+    border: 1px solid var(--secondary-color);
+}
